@@ -1,0 +1,9 @@
+services:
+  poker-db:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=poker
+      - POSTGRES_USER=poker
+      - POSTGRES_PASSWORD=poker

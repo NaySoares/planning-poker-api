@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  ADMIN
+  VISITOR
+}
+
+enum RoomStatus {
+  WAITING
+  IN_PROGRESS
+  FINISHED
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  passwordHash  String?
+  type          UserType  @default(ADMIN)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  rooms         Room[]    @relation("RoomMaster")
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Room {
+  id          String     @id @default(uuid())
+  code        String     @unique
+  master      User       @relation("RoomMaster", fields: [masterId], references: [id])
+  masterId    String
+  tasks       Task[]
+  players     Player[]
+  currentTask String?
+  status      RoomStatus @default(WAITING)
+  createdAt   DateTime   @default(now())
+}
+
+model Player {
+  id          String  @id @default(uuid())
+  name        String
+  avatar      String?
+  room        Room    @relation(fields: [roomId], references: [id])
+  roomId      String
+  socketId    String?
+  currentVote Int?
+  isMaster    Boolean @default(false)
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  room        Room     @relation(fields: [roomId], references: [id])
+  roomId      String
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  expiresAt    DateTime
+  refreshToken String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  ipAddress    String?
+  userAgent    String?
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([refreshToken])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
