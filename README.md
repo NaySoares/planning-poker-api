@@ -16,12 +16,6 @@ Sincronizar com as modificações mais recentes no banco.
 npx prisma migrate dev
 ```
 
-Popular o banco com dados de teste
-OBS: Execute apenas se nunca subiu o projeto antes, pois o script deleta os registros existentes.
-```bash
-npx prisma db seed
-```
-
 Subir o projeto
 ```bash
 npm run dev
