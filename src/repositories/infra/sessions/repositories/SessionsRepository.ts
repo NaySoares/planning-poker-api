@@ -8,7 +8,7 @@ import { prisma } from 'lib/prisma'
 class SessionsRepository implements ISessionsRepository {
   async create({
     userId,
-    token,
+    refreshToken,
     expiresAt,
     createdAt = new Date(),
     updatedAt = new Date(),
@@ -17,7 +17,7 @@ class SessionsRepository implements ISessionsRepository {
       data: {
         id: crypto.randomUUID(),
         userId,
-        token,
+        refreshToken,
         expiresAt,
         createdAt,
         updatedAt,
@@ -39,7 +39,7 @@ class SessionsRepository implements ISessionsRepository {
     refreshToken: string,
   ): Promise<Session | null> {
     const session = await prisma.session.findFirst({
-      where: { userId, token: refreshToken },
+      where: { userId, refreshToken },
     })
 
     return session || null

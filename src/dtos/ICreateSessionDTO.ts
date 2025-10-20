@@ -1,6 +1,6 @@
 interface ICreateSessionDTO {
   userId: string
-  token: string
+  refreshToken: string
   expiresAt: Date
   createdAt?: Date
   updatedAt?: Date

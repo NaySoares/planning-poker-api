@@ -1,28 +1,25 @@
 import 'reflect-metadata'
 import '@shared/container'
 
+import cors from 'cors'
+import http from 'http'
+import { Server } from 'socket.io'
+import { gameSocket } from './sockets/gameSocket'
+
 import express, { NextFunction, Request, Response } from 'express'
 
 import { router } from './http/routes'
 import { AppError } from '@shared/errors/AppError'
 
 const app = express()
-
-// Cors
-app.use((request: Request, response: Response, next: NextFunction) => {
-  response.header('Access-Control-Allow-Origin', '*')
-  response.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Authorization, Accept',
-  )
-  response.header('Access-Control-Allow-Credentials', 'true')
-  response.header(
-    'Access-Control-Allow-Methods',
-    'GET, POST, OPTIONS, PUT, DELETE',
-  )
-  next()
+const server = http.createServer(app)
+const io = new Server(server, {
+  cors: { origin: '*' },
 })
 
+io.on('connection', (socket) => gameSocket(io, socket))
+
+app.use(cors())
 app.use(express.json())
 app.use(router)
 
