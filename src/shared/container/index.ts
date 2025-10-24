@@ -7,6 +7,8 @@ import { UsersRepository } from 'repositories/infra/users/repositories/UsersRepo
 import { container } from 'tsyringe'
 
 import '@shared/container/providers'
+import { IRoomsRepository } from 'repositories/infra/rooms/IRoomsRepository'
+import { RoomsRepository } from 'repositories/infra/rooms/repositories/RoomsRepository'
 
 container.registerSingleton<IUsersRepository>(
   'IUsersRepository',
@@ -21,4 +23,9 @@ container.registerSingleton<IAccountsRepository>(
 container.registerSingleton<ISessionsRepository>(
   'ISessionsRepository',
   SessionsRepository,
+)
+
+container.registerSingleton<IRoomsRepository>(
+  'IRoomsRepository',
+  RoomsRepository,
 )

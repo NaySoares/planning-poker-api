@@ -1,18 +1,27 @@
 import { Server, Socket } from 'socket.io'
 import { prisma } from 'lib/prisma'
 import { calculateConsensus } from '@utils/calculateConsensus'
+import { GetRoomUseCase } from 'use-cases/rooms/GetRoomUseCase'
+import { container } from 'tsyringe'
 
 export function gameSocket(io: Server, socket: Socket) {
   console.log('🧩 New connection:', socket.id)
 
   socket.on('join_room', async ({ roomCode, name, avatar }) => {
-    const room = await prisma.room.findUnique({
-      where: { code: roomCode },
-      include: { players: true, tasks: true },
+    const getRoomUseCase = container.resolve(GetRoomUseCase)
+
+    const room = await getRoomUseCase.execute({
+      masterId: undefined,
+      code: roomCode,
     })
 
     if (!room) {
       socket.emit('error', 'Sala não encontrada')
+      return
+    }
+
+    if (room.players.length >= 10) {
+      socket.emit('error', 'A sala já possui o número máximo de jogadores')
       return
     }
 

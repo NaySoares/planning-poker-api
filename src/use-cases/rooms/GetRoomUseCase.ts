@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe'
 import { ICreateRoomDTO } from 'dtos/ICreateRoomDTO'
-import { Room } from 'generated/prisma'
 import { IRoomsRepository } from 'repositories/infra/rooms/IRoomsRepository'
+import { RoomWithRelations } from '@types'
 
 @injectable()
 class GetRoomUseCase {
@@ -13,10 +13,10 @@ class GetRoomUseCase {
     /* nothing */
   }
 
-  async execute({ code }: ICreateRoomDTO): Promise<Room> {
+  async execute({ code }: ICreateRoomDTO): Promise<RoomWithRelations | null> {
     const room = await this.roomsRepository.getRoomByCode(code!)
 
-    return room!
+    return room
   }
 }
 

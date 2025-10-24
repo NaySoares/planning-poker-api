@@ -3,6 +3,7 @@ import { injectable } from 'tsyringe'
 import { prisma } from 'lib/prisma'
 import { IRoomsRepository } from '../IRoomsRepository'
 import { ICreateRoomDTO } from 'dtos/ICreateRoomDTO'
+import { RoomWithRelations } from '@types'
 
 @injectable()
 class RoomsRepository implements IRoomsRepository {
@@ -30,9 +31,10 @@ class RoomsRepository implements IRoomsRepository {
     await prisma.room.deleteMany({ where: { masterId } })
   }
 
-  async getRoomByCode(code: string): Promise<Room | null> {
+  async getRoomByCode(code: string): Promise<RoomWithRelations | null> {
     const room = await prisma.room.findUnique({
       where: { code },
+      include: { players: true, tasks: true },
     })
 
     return room || null

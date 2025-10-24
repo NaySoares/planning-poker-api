@@ -4,25 +4,36 @@ import '@shared/container'
 import cors from 'cors'
 import http from 'http'
 import { Server } from 'socket.io'
-import { gameSocket } from './sockets/gameSocket'
-
 import express, { NextFunction, Request, Response } from 'express'
 
+import { gameSocket } from './sockets/gameSocket'
 import { router } from './http/routes'
 import { AppError } from '@shared/errors/AppError'
 
 const app = express()
 const server = http.createServer(app)
+
+// Configuração do Socket.IO
 const io = new Server(server, {
-  cors: { origin: '*' },
+  cors: {
+    origin: ['http://localhost:3000'], // frontend Next
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true,
+  },
 })
 
-io.on('connection', (socket) => gameSocket(io, socket))
+// Eventos de conexão do socket
+io.on('connection', (socket) => {
+  console.log('🟢 Novo cliente conectado:', socket.id)
+  gameSocket(io, socket)
+})
 
-app.use(cors())
+// Middlewares Express
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }))
 app.use(express.json())
 app.use(router)
 
+// Tratamento de erros
 app.use(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (err: Error, request: Request, response: Response, next: NextFunction) => {
@@ -41,4 +52,4 @@ app.use(
   },
 )
 
-export { app }
+export { server, io }

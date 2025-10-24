@@ -1,5 +1,5 @@
-import { app } from './app'
+import { server } from './app'
 
 const PORT = process.env.PORT || 3333
 
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}!`))
+server.listen(PORT, () => console.log(`Server is running on port ${PORT}!`))
