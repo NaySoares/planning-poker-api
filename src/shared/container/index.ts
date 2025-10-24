@@ -9,6 +9,10 @@ import { container } from 'tsyringe'
 import '@shared/container/providers'
 import { IRoomsRepository } from 'repositories/infra/rooms/IRoomsRepository'
 import { RoomsRepository } from 'repositories/infra/rooms/repositories/RoomsRepository'
+import { PlayersRepository } from 'repositories/infra/players/repositories/PlayersRepository'
+import { IPlayersRepository } from 'repositories/infra/players/IPlayersRepository'
+import { ITasksRepository } from 'repositories/infra/tasks/ITasksRepository'
+import { TasksRepository } from 'repositories/infra/tasks/repositories/TasksRepository'
 
 container.registerSingleton<IUsersRepository>(
   'IUsersRepository',
@@ -28,4 +32,14 @@ container.registerSingleton<ISessionsRepository>(
 container.registerSingleton<IRoomsRepository>(
   'IRoomsRepository',
   RoomsRepository,
+)
+
+container.registerSingleton<IPlayersRepository>(
+  'IPlayersRepository',
+  PlayersRepository,
+)
+
+container.registerSingleton<ITasksRepository>(
+  'ITasksRepository',
+  TasksRepository,
 )
