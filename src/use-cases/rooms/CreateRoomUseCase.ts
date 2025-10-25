@@ -5,6 +5,7 @@ import { IRoomsRepository } from 'repositories/infra/rooms/IRoomsRepository'
 import { AuthenticateUserUseCase } from 'use-cases/users/AuthenticateUserUseCase'
 import { Room } from 'generated/prisma'
 import { CreatePlayerUseCase } from 'use-cases/players/CreatePlayerUseCase'
+import { env } from 'process'
 
 interface IResponse {
   token: string
@@ -46,9 +47,11 @@ class CreateRoomUseCase {
       code,
     })
 
+    const urlAvatarDefault = env.BASE_URL_SERVER + '/avatar/'
+
     const player = await createPlayerUseCase.execute({
       name: dataReturn.user.name,
-      avatar: null,
+      avatar: urlAvatarDefault,
       isMaster: true,
       roomId: room.id,
       socketId: null,

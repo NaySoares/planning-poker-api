@@ -4,6 +4,7 @@ import { IRoomsRepository } from 'repositories/infra/rooms/IRoomsRepository'
 import { RoomWithRelations } from '@types'
 import { AppError } from '@shared/errors/AppError'
 import { CreatePlayerUseCase } from 'use-cases/players/CreatePlayerUseCase'
+import { env } from 'process'
 
 @injectable()
 class JoinRoomUseCase {
@@ -35,9 +36,11 @@ class JoinRoomUseCase {
       throw new AppError('Nome de jogador já está em uso na sala')
     }
 
+    const urlAvatarDefault = env.BASE_URL_SERVER + '/avatar/'
+
     const player = await createPlayerUseCase.execute({
       name,
-      avatar: null,
+      avatar: urlAvatarDefault,
       isMaster: false,
       roomId: room.id,
       socketId: null,

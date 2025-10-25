@@ -69,7 +69,7 @@ export const joinRoomHandler = (socket: Socket, io: Server) => {
 
       const player = await createPlayerUseCase.execute({
         name,
-        avatar,
+        avatar: avatar ?? avatarDefault,
         isMaster,
         roomId: room.id,
         socketId: socket.id,
