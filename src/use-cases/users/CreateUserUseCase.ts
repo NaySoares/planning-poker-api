@@ -34,6 +34,8 @@ class CreateUserUseCase {
       password: passwordHash,
     })
 
+    console.log('Usuário criado:', user)
+
     const account = await this.accountsRepository.create({
       accountId: user.id,
       providerId: 'credential',
@@ -41,7 +43,7 @@ class CreateUserUseCase {
       userId: user.id,
     })
 
-    console.log('Account created:', account)
+    console.log('Conta criada:', account)
 
     return user
   }

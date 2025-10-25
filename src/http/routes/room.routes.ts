@@ -1,12 +1,12 @@
 import { Router } from 'express'
 import { CreateRoomController } from 'http/controllers/rooms/CreateRoomController'
-import { GetRoomController } from 'http/controllers/rooms/GetRoomController'
+import { JoinRoomController } from 'http/controllers/rooms/JoinRoomController'
 
-const routes = Router()
+const roomRoutes = Router()
 const createRoomController = new CreateRoomController()
-const getRoomController = new GetRoomController()
+const joinRoomController = new JoinRoomController()
 
-routes.post('/', createRoomController.handle)
-routes.get('/:code', getRoomController.handle)
+roomRoutes.post('/', createRoomController.handle)
+roomRoutes.post('/join', joinRoomController.handle)
 
-export default routes
+export { roomRoutes }

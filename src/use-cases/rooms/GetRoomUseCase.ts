@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe'
 import { ICreateRoomDTO } from 'dtos/ICreateRoomDTO'
 import { IRoomsRepository } from 'repositories/infra/rooms/IRoomsRepository'
 import { RoomWithRelations } from '@types'
+import { AppError } from '@shared/errors/AppError'
 
 @injectable()
 class GetRoomUseCase {
@@ -15,6 +16,10 @@ class GetRoomUseCase {
 
   async execute({ code }: ICreateRoomDTO): Promise<RoomWithRelations | null> {
     const room = await this.roomsRepository.getRoomByCode(code!)
+
+    if (!room) {
+      throw new AppError('Sala não encontrada')
+    }
 
     return room
   }

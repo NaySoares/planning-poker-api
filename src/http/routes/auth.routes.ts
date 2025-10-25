@@ -12,4 +12,5 @@ const refreshTokenController = new RefreshTokenController()
 authRoutes.post('/signup', createUserController.handle)
 authRoutes.post('/session', authenticateUserController.handle)
 authRoutes.post('/refresh', refreshTokenController.handle)
+
 export { authRoutes }

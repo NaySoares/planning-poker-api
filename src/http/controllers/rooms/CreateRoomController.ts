@@ -4,18 +4,23 @@ import { CreateRoomUseCase } from 'use-cases/rooms/CreateRoomUseCase'
 
 export class CreateRoomController {
   async handle(req: Request, res: Response) {
-    const { masterId } = req.body
+    const { email, password } = req.body
 
-    if (!masterId) {
-      return res.status(400).json({ error: 'masterId é obrigatório' })
+    if (!email) {
+      return res.status(400).json({ error: 'Email é obrigatório' })
+    }
+
+    if (!password) {
+      return res.status(400).json({ error: 'Senha é obrigatória' })
     }
 
     const createRoomUseCase = container.resolve(CreateRoomUseCase)
 
-    const room = await createRoomUseCase.execute({
-      masterId,
+    const response = await createRoomUseCase.execute({
+      email,
+      password,
     })
 
-    return res.status(201).json(room)
+    return res.status(201).json(response)
   }
 }

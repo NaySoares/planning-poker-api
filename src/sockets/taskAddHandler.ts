@@ -1,18 +1,18 @@
 import { Server, Socket } from 'socket.io'
 import { container } from 'tsyringe'
-import { GetRoomUseCase } from 'use-cases/rooms/GetRoomUseCase'
+import { JoinRoomUseCase } from 'use-cases/rooms/JoinRoomUseCase'
 import { CreateTaskUseCase } from 'use-cases/tasks/CreateTaskUseCase'
 import { GetAllTasksByRoomIdUseCase } from 'use-cases/tasks/GetAllTasksByRoomIdUseCase'
 
 export const taskAddHandler = (socket: Socket, io: Server) => {
   socket.on('task:add', async ({ roomCode, title, description }) => {
-    const getRoomUseCase = container.resolve(GetRoomUseCase)
+    const joinRoomUseCase = container.resolve(JoinRoomUseCase)
     const createTaskUseCase = container.resolve(CreateTaskUseCase)
     const getAllTasksByRoomIdUseCase = container.resolve(
       GetAllTasksByRoomIdUseCase,
     )
 
-    const room = await getRoomUseCase.execute({
+    const room = await joinRoomUseCase.execute({
       masterId: undefined,
       code: roomCode,
     })

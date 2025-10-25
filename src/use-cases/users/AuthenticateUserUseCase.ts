@@ -10,6 +10,7 @@ import { ISessionsRepository } from 'repositories/infra/sessions/ISessionsReposi
 
 interface IResponse {
   user: {
+    id: string
     name: string
     email: string
   }
@@ -64,20 +65,21 @@ class AuthenticateUserUseCase {
 
     await this.sessionsRepository.create({
       userId: user.id,
-      token: refreshToken,
+      refreshToken,
       expiresAt: refreshTokenExpiresAt,
     })
 
-    const tokenReturn: IResponse = {
+    const dataReturn: IResponse = {
       token,
       refreshToken,
       user: {
+        id: user.id,
         name: user.name,
         email: user.email,
       },
     }
 
-    return tokenReturn
+    return dataReturn
   }
 }
 
