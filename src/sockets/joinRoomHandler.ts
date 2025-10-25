@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io'
 import { container } from 'tsyringe'
+import { GetAvatarUseCase } from 'use-cases/avatars/GetAvatarUseCase'
 import { CreatePlayerUseCase } from 'use-cases/players/CreatePlayerUseCase'
 import { GetAllPlayersByRoomIdUseCase } from 'use-cases/players/GetAllPlayersByRoomIdUseCase'
 import { GetRoomUseCase } from 'use-cases/rooms/GetRoomUseCase'
@@ -9,6 +10,7 @@ export const joinRoomHandler = (socket: Socket, io: Server) => {
     'join_room',
     async ({ roomCode, playerId, name, avatar, masterId }) => {
       const getRoomUseCase = container.resolve(GetRoomUseCase)
+      const getAvatarUseCase = container.resolve(GetAvatarUseCase)
       const createPlayerUseCase = container.resolve(CreatePlayerUseCase)
       const getAllPlayersByRoomIdUseCase = container.resolve(
         GetAllPlayersByRoomIdUseCase,
@@ -33,7 +35,8 @@ export const joinRoomHandler = (socket: Socket, io: Server) => {
 
       if (existingPlayer) {
         existingPlayer.socketId = socket.id
-        existingPlayer.avatar = existingPlayer.avatar || avatar
+        existingPlayer.avatar =
+          existingPlayer.avatar || (await getAvatarUseCase.execute())
         console.log('🔄 Jogador reconectado:', existingPlayer)
         socket.join(roomCode)
 

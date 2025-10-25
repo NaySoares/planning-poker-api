@@ -13,6 +13,8 @@ import { PlayersRepository } from 'repositories/infra/players/repositories/Playe
 import { IPlayersRepository } from 'repositories/infra/players/IPlayersRepository'
 import { ITasksRepository } from 'repositories/infra/tasks/ITasksRepository'
 import { TasksRepository } from 'repositories/infra/tasks/repositories/TasksRepository'
+import { AvatarsRepository } from 'repositories/infra/avatars/repositories/AccountsRepository'
+import { IAvatarsRepository } from 'repositories/infra/avatars/IAvatarsRepository'
 
 container.registerSingleton<IUsersRepository>(
   'IUsersRepository',
@@ -42,4 +44,9 @@ container.registerSingleton<IPlayersRepository>(
 container.registerSingleton<ITasksRepository>(
   'ITasksRepository',
   TasksRepository,
+)
+
+container.registerSingleton<IAvatarsRepository>(
+  'IAvatarsRepository',
+  AvatarsRepository,
 )
