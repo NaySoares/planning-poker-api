@@ -1,13 +1,13 @@
 import { calculateConsensus } from '@utils/calculateConsensus'
 import { Server, Socket } from 'socket.io'
 import { container } from 'tsyringe'
-import { JoinRoomUseCase } from 'use-cases/rooms/JoinRoomUseCase'
+import { GetRoomUseCase } from 'use-cases/rooms/GetRoomUseCase'
 
 export const voteRevealHandler = (socket: Socket, io: Server) => {
   socket.on('vote:reveal', async ({ roomCode }) => {
-    const joinRoomUseCase = container.resolve(JoinRoomUseCase)
+    const getRoomUseCase = container.resolve(GetRoomUseCase)
 
-    const room = await joinRoomUseCase.execute({
+    const room = await getRoomUseCase.execute({
       masterId: undefined,
       code: roomCode,
     })

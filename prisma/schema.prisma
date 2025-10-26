@@ -53,10 +53,11 @@ model Player {
   id          String  @id @default(uuid())
   name        String
   avatar      String?
-  room        Room    @relation(fields: [roomId], references: [id])
+  room        Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
   roomId      String
   socketId    String?
   currentVote Int?
+  isOnline    Boolean @default(true)
   isMaster    Boolean @default(false)
 }
 
@@ -64,7 +65,7 @@ model Task {
   id          String   @id @default(uuid())
   title       String
   description String?
-  room        Room     @relation(fields: [roomId], references: [id])
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
   roomId      String
   completed   Boolean  @default(false)
   createdAt   DateTime @default(now())

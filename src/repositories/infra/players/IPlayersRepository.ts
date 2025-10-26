@@ -8,6 +8,11 @@ interface IPlayersRepository {
   findPlayersByRoomId(roomId: string): Promise<Player[]>
   findPlayersByRoomCode(roomCode: string): Promise<Player[]>
   updateVote(playerId: string, value: number): Promise<void>
+  markAsOffline(socketId: string): Promise<void>
+  updateByPlayerId(
+    playerId: string,
+    data: Partial<ICreatePlayerDTO>,
+  ): Promise<Player>
 }
 
 export { IPlayersRepository }

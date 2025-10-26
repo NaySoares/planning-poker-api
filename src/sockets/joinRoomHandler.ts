@@ -3,90 +3,108 @@ import { Server, Socket } from 'socket.io'
 import { container } from 'tsyringe'
 import { CreatePlayerUseCase } from 'use-cases/players/CreatePlayerUseCase'
 import { GetAllPlayersByRoomIdUseCase } from 'use-cases/players/GetAllPlayersByRoomIdUseCase'
+import { UpdatePlayerByPlayerIdUseCase } from 'use-cases/players/UpdatePlayerByPlayerIdUseCase'
 import { GetRoomUseCase } from 'use-cases/rooms/GetRoomUseCase'
 
 export const joinRoomHandler = (socket: Socket, io: Server) => {
   socket.on(
     'join_room',
     async ({ roomCode, playerId, name, avatar, masterId }) => {
-      const getRoomUseCase = container.resolve(GetRoomUseCase)
-      const createPlayerUseCase = container.resolve(CreatePlayerUseCase)
-      const getAllPlayersByRoomIdUseCase = container.resolve(
-        GetAllPlayersByRoomIdUseCase,
-      )
+      try {
+        const getRoomUseCase = container.resolve(GetRoomUseCase)
+        const createPlayerUseCase = container.resolve(CreatePlayerUseCase)
+        const updatePlayerByPlayerIdUseCase = container.resolve(
+          UpdatePlayerByPlayerIdUseCase,
+        )
 
-      if (!playerId) return socket.emit('error', 'Erro ao identificar jogador')
+        const getAllPlayersByRoomIdUseCase = container.resolve(
+          GetAllPlayersByRoomIdUseCase,
+        )
 
-      const room = await getRoomUseCase.execute({
-        masterId: undefined,
-        code: roomCode,
-      })
+        if (!playerId)
+          return socket.emit('error', 'Erro ao identificar jogador')
 
-      if (!room) {
-        socket.emit('error', 'Sala não encontrada')
-        return
-      }
+        const room = await getRoomUseCase.execute({
+          masterId: undefined,
+          code: roomCode,
+        })
 
-      // verifica se é uma reconexão de um jogador existente
-      const existingPlayer = room.players.find(
-        (player) => player.id === playerId,
-      )
+        if (!room) {
+          socket.emit('error', 'Sala não encontrada')
+          return
+        }
 
-      const avatarDefault = env.BASE_URL_SERVER + '/avatar/'
+        // verifica se é uma reconexão de um jogador existente
+        const existingPlayer = room.players.find(
+          (player) => player.id === playerId,
+        )
 
-      if (existingPlayer) {
-        existingPlayer.socketId = socket.id
-        existingPlayer.avatar = existingPlayer.avatar || avatarDefault
-        console.log('🔄 Jogador reconectado:', existingPlayer)
+        const avatarDefault = env.BASE_URL_SERVER + '/avatar/'
+
+        if (existingPlayer) {
+          const playerUpdated = await updatePlayerByPlayerIdUseCase.execute({
+            playerId: existingPlayer.id,
+            data: {
+              socketId: socket.id,
+              avatar: existingPlayer.avatar || avatarDefault,
+              isOnline: true,
+            },
+          })
+
+          console.log('🔄 Jogador reconectado:', playerUpdated)
+          socket.join(roomCode)
+
+          // atualiza quem estiver na sala com uma nova lista de players e tasks
+          io.to(roomCode).emit('room:update', {
+            players: room.players,
+            tasks: room.tasks,
+          })
+
+          // Quebra o fluxo para não criar um novo jogador
+          return
+        }
+
+        // Verifica se já existe um jogador com o mesmo nome na sala para evitar duplicidade
+        const sameName = room.players.find((player) => player.name === name)
+
+        if (sameName) {
+          socket.emit('error', 'Já existe um jogador com esse nome na sala')
+          return
+        }
+
+        // TODO: ajustar para limitar o número de jogadores com base na configuração da sala
+        if (room.players.length >= 10) {
+          socket.emit('error', 'A sala já possui o número máximo de jogadores')
+          return
+        }
+
+        // Apenas o master enviará seu masterId para se identificar
+        const isMaster = room.masterId === masterId
+
+        const player = await createPlayerUseCase.execute({
+          name,
+          avatar: avatar ?? avatarDefault,
+          isMaster,
+          roomId: room.id,
+          socketId: socket.id,
+        })
+
+        console.log('🆕 New player:', player)
         socket.join(roomCode)
 
         // atualiza quem estiver na sala com uma nova lista de players e tasks
         io.to(roomCode).emit('room:update', {
-          players: room.players,
+          players: await getAllPlayersByRoomIdUseCase.execute({
+            roomId: room.id,
+          }),
           tasks: room.tasks,
         })
 
-        // Quebra o fluxo para não criar um novo jogador
-        return
+        console.log(`👤 ${name} entrou na sala ${roomCode}`)
+      } catch (error) {
+        console.error('Erro ao entrar na sala:', error)
+        socket.emit('error', 'Sala não encontrada')
       }
-
-      // Verifica se já existe um jogador com o mesmo nome na sala para evitar duplicidade
-      const sameName = room.players.find((player) => player.name === name)
-
-      if (sameName) {
-        socket.emit('error', 'Já existe um jogador com esse nome na sala')
-        return
-      }
-
-      // TODO: ajustar para limitar o número de jogadores com base na configuração da sala
-      if (room.players.length >= 10) {
-        socket.emit('error', 'A sala já possui o número máximo de jogadores')
-        return
-      }
-
-      // Apenas o master enviará seu masterId para se identificar
-      const isMaster = room.masterId === masterId
-
-      const player = await createPlayerUseCase.execute({
-        name,
-        avatar: avatar ?? avatarDefault,
-        isMaster,
-        roomId: room.id,
-        socketId: socket.id,
-      })
-
-      console.log('🆕 New player:', player)
-      socket.join(roomCode)
-
-      // atualiza quem estiver na sala com uma nova lista de players e tasks
-      io.to(roomCode).emit('room:update', {
-        players: await getAllPlayersByRoomIdUseCase.execute({
-          roomId: room.id,
-        }),
-        tasks: room.tasks,
-      })
-
-      console.log(`👤 ${name} entrou na sala ${roomCode}`)
     },
   )
 }

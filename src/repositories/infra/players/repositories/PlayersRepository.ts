@@ -73,6 +73,25 @@ class PlayersRepository implements IPlayersRepository {
       data: { currentVote: value },
     })
   }
+
+  async markAsOffline(socketId: string): Promise<void> {
+    await prisma.player.updateMany({
+      where: { socketId },
+      data: { isOnline: false },
+    })
+  }
+
+  async updateByPlayerId(
+    playerId: string,
+    data: Partial<ICreatePlayerDTO>,
+  ): Promise<Player> {
+    const player = await prisma.player.update({
+      where: { id: playerId },
+      data,
+    })
+
+    return player
+  }
 }
 
 export { PlayersRepository }

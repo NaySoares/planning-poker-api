@@ -4,6 +4,7 @@ interface ICreatePlayerDTO {
   isMaster: boolean
   roomId: string
   socketId: string
+  isOnline?: boolean
 }
 
 export { ICreatePlayerDTO }

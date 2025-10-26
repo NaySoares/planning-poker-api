@@ -44,6 +44,27 @@ class RoomsRepository implements IRoomsRepository {
     const rooms = await prisma.room.findMany()
     return rooms
   }
+
+  async findRoomByPlayerSocketId(
+    socketId: string,
+  ): Promise<RoomWithRelations | null> {
+    const room = await prisma.room.findFirst({
+      where: {
+        players: {
+          some: {
+            socketId,
+          },
+        },
+      },
+      include: { players: true, tasks: true },
+    })
+
+    return room || null
+  }
+
+  async deleteById(id: string): Promise<void> {
+    await prisma.room.deleteMany({ where: { id } })
+  }
 }
 
 export { RoomsRepository }
