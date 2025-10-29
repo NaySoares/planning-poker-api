@@ -7,6 +7,7 @@ import { playerKickHandler } from './playerKickHandler'
 import { playerDisconnectHandler } from './playerDisconnectHandler'
 import { taskRemoveHandler } from './taskRemoveHandler'
 import { playerMakerMasterHandler } from './playerMakerMasterHandler'
+import { roomCloseHandler } from './roomCloseHandler'
 
 export function gameSocket(io: Server, socket: Socket) {
   console.log('🧩 New connection:', socket.id)
@@ -14,6 +15,7 @@ export function gameSocket(io: Server, socket: Socket) {
   // Room Handlers
   joinRoomHandler(socket, io)
   playerMakerMasterHandler(socket, io)
+  roomCloseHandler(socket, io)
 
   // Task Handlers
   taskAddHandler(socket, io)

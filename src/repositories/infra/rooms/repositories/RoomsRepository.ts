@@ -75,6 +75,10 @@ class RoomsRepository implements IRoomsRepository {
       data: { masterId: data.masterId },
     })
   }
+
+  async deleteByRoomCode(code: string): Promise<void> {
+    await prisma.room.deleteMany({ where: { code } })
+  }
 }
 
 export { RoomsRepository }
