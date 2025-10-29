@@ -3,9 +3,9 @@ import { Task } from 'generated/prisma/edge'
 
 interface ITasksRepository {
   create(data: ICreateTaskDTO): Promise<Task>
-  delete(id: string): Promise<void>
   findTaskById(id: string): Promise<Task | null>
   findTasksByRoomId(roomId: string): Promise<Task[]>
+  delete(taskId: string): Promise<void>
 }
 
 export { ITasksRepository }

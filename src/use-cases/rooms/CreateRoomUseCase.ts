@@ -39,11 +39,10 @@ class CreateRoomUseCase {
       email,
     })
 
-    const masterId = dataReturn.user.id
     const code = randomBytes(3).toString('hex').toUpperCase()
 
     const room = await this.roomsRepository.create({
-      masterId,
+      masterId: undefined,
       code,
     })
 
@@ -57,10 +56,15 @@ class CreateRoomUseCase {
       socketId: null,
     })
 
+    await this.roomsRepository.updateMasterId({
+      roomId: room.id,
+      masterId: player.id,
+    })
+
     const response: IResponse = {
       token: dataReturn.token,
       refreshToken: dataReturn.refreshToken,
-      masterId,
+      masterId: player.id,
       room,
       user: {
         id: dataReturn.user.id,

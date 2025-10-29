@@ -1,13 +1,13 @@
 import { Server, Socket } from 'socket.io'
 import { container } from 'tsyringe'
 import { GetRoomUseCase } from 'use-cases/rooms/GetRoomUseCase'
-import { CreateTaskUseCase } from 'use-cases/tasks/CreateTaskUseCase'
+import { DeleteTaskUseCase } from 'use-cases/tasks/DeleteTaskUseCase'
 import { GetAllTasksByRoomIdUseCase } from 'use-cases/tasks/GetAllTasksByRoomIdUseCase'
 
-export const taskAddHandler = (socket: Socket, io: Server) => {
-  socket.on('task:add', async ({ roomCode, title, description, playerId }) => {
+export const taskRemoveHandler = (socket: Socket, io: Server) => {
+  socket.on('task:remove', async ({ roomCode, taskId, playerId }) => {
     const getRoomUseCase = container.resolve(GetRoomUseCase)
-    const createTaskUseCase = container.resolve(CreateTaskUseCase)
+    const deleteTaskUseCase = container.resolve(DeleteTaskUseCase)
     const getAllTasksByRoomIdUseCase = container.resolve(
       GetAllTasksByRoomIdUseCase,
     )
@@ -20,14 +20,12 @@ export const taskAddHandler = (socket: Socket, io: Server) => {
     if (!room) return
 
     if (playerId !== room.masterId) {
-      socket.emit('error', 'Apenas o mestre da sala pode adicionar tarefas')
+      socket.emit('error', 'Apenas o mestre da sala pode remover tarefas')
       return
     }
 
-    await createTaskUseCase.execute({
-      title,
-      description,
-      roomId: room.id,
+    await deleteTaskUseCase.execute({
+      taskId,
     })
 
     io.to(roomCode).emit('task:update', {

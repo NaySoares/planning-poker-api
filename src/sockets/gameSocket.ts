@@ -5,6 +5,7 @@ import { voteSendHandler } from './voteSendHandler'
 import { voteRevealHandler } from './voteRevealHandler'
 import { playerKickHandler } from './playerKickHandler'
 import { playerDisconnectHandler } from './playerDisconnectHandler'
+import { taskRemoveHandler } from './taskRemoveHandler'
 
 export function gameSocket(io: Server, socket: Socket) {
   console.log('🧩 New connection:', socket.id)
@@ -14,6 +15,7 @@ export function gameSocket(io: Server, socket: Socket) {
 
   // Task Handlers
   taskAddHandler(socket, io)
+  taskRemoveHandler(socket, io)
 
   // Voting Handlers
   voteSendHandler(socket, io)
