@@ -6,12 +6,14 @@ import { voteRevealHandler } from './voteRevealHandler'
 import { playerKickHandler } from './playerKickHandler'
 import { playerDisconnectHandler } from './playerDisconnectHandler'
 import { taskRemoveHandler } from './taskRemoveHandler'
+import { playerMakerMasterHandler } from './playerMakerMasterHandler'
 
 export function gameSocket(io: Server, socket: Socket) {
   console.log('🧩 New connection:', socket.id)
 
   // Room Handlers
   joinRoomHandler(socket, io)
+  playerMakerMasterHandler(socket, io)
 
   // Task Handlers
   taskAddHandler(socket, io)

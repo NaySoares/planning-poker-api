@@ -56,7 +56,9 @@ export const joinRoomHandler = (socket: Socket, io: Server) => {
 
           // atualiza quem estiver na sala com uma nova lista de players e tasks
           io.to(roomCode).emit('room:update', {
-            players: room.players,
+            players: await getAllPlayersByRoomIdUseCase.execute({
+              roomId: room.id,
+            }),
             tasks: room.tasks,
           })
 
