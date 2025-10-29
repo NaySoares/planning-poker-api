@@ -12,6 +12,7 @@ interface IRoomsRepository {
   getRooms(): Promise<Room[]>
   findRoomByPlayerSocketId(socketId: string): Promise<RoomWithRelations | null>
   updateMasterId(data: { roomId: string; masterId: string }): Promise<void>
+  leaveRoomByPlayerId(roomCode: string, playerId: string): Promise<void>
 }
 
 export { IRoomsRepository }
